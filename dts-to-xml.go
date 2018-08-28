@@ -4,13 +4,9 @@ import (
 	"fmt"
 	"os"
 	"bufio"
-	"regexp"
-)
-
-const (
-	NodeStart = 0 << iota
-	NodeBody
-	NodeEnd
+	// "regexp"
+	"strings"
+	// "unicode"
 )
 
 var state int = 0
@@ -19,37 +15,45 @@ var depth int = 0
 type Node struct {
 	Name string
 	NumChilds int
+	Parent *Node
 	Child *Node
 //	Childs []Node
 }
 
 func main() {
-	regNodeStart := regexp.MustCompile(`\{`)
-	regNodeEnd := regexp.MustCompile(`\};`)
 	var top Node
 	var p *Node
 	p = &top
+	state := ""
 
 	top.Name = "top"
 	fmt.Println("init: ", top)
 
 	input := bufio.NewScanner(os.Stdin)
 	for input.Scan() {
-		if(regNodeStart.MatchString(input.Text())) {
+		trimedInput := strings.TrimSpace(input.Text())
+		if(trimedInput == "") {
+			// blank line
+			state = "-"
+		} else if(strings.HasSuffix(trimedInput, "{")) {
+			// node start
 			p.NumChilds++
-			fmt.Println(p.NumChilds)
 			p.Child = new(Node)
+			p.Child.Name = "child"
+			p.Child.NumChilds = 0
+			fmt.Println(p)
+			p.Child.Parent = p
 			p = p.Child
-			p.Name = "child"
-			p.NumChilds = 0
-			state = 0
+			state = "S"
 			depth++
-		} else if(regNodeEnd.MatchString(input.Text())) {
-			state = 1
+		} else if(strings.HasSuffix(trimedInput, "};")) {
+			// node end
+			state = "E"
 			depth--
 		} else {
-			state = 2
+			// node body
+			state = "B"
 		}
-		fmt.Printf("%d [%d] %s\n", state, depth, input.Text())
+		fmt.Printf("%s [%d] %s\n", state, depth, input.Text())
 	}
 }
