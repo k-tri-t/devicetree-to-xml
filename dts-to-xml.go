@@ -14,11 +14,13 @@ var depth int = 0
 
 type Node struct {
 	Name string
-	NumChilds int
-	Parent *Node
-	Child *Node
+	// NumChilds int
+	// Parent *Node
+	Children []*Node
 //	Childs []Node
 }
+
+var root *Node
 
 func main() {
 	var top Node
@@ -56,4 +58,24 @@ func main() {
 		}
 		fmt.Printf("%s [%d] %s\n", state, depth, input.Text())
 	}
+}
+
+func showNode(node *Node, prefix string) {
+    if prefix == "" {
+        fmt.Printf("%v\n\n", node.name)
+    } else {
+        fmt.Printf("%v %v\n\n", prefix, node.name)
+    }
+    for _, n := range node.children {
+        showNode(n, prefix+"--")
+    }
+}
+
+func show() {
+    if root == nil {
+        fmt.Printf("show: root node not found\n")
+        return
+    }
+    fmt.Printf("RESULT:\n")
+    showNode(root, "")
 }
